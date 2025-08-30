@@ -1,0 +1,16 @@
+{
+  "manifest_version": 3,
+  "name": "ImpulseGuard",
+  "version": "0.1.0",
+  "description": "Sentiscore badge + explain + rewrite + 5s cooldown in Telegram Web and Gmail.",
+  "permissions": ["storage", "activeTab", "scripting"],
+  "host_permissions": ["http://127.0.0.1:8000/*", "http://localhost:8000/*"],
+  "background": { "service_worker": "background.js" },
+  "options_ui": { "page": "options.html", "open_in_tab": true },
+  "content_scripts": [{
+  "matches": ["https://web.telegram.org/*", "https://mail.google.com/*"],
+  "all_frames": true,
+  "run_at": "document_start",
+  "js": ["content.bundle.js"]
+}]
+}
