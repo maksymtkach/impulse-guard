@@ -44,16 +44,139 @@ export const ensureDemoToken = (): void => {
     }
 };
 
-export const mockSummaryData = {
+interface TimelineEvent {
+    id: string;
+    timestamp: string;
+    sentiscore: number;
+    emotions: Record<string, number>;
+    risks: string[];
+    description: string;
+}
+
+interface RiskAssessment {
+    category: string;
+    level: 'warning' | 'super-risky' | 'critical';
+    count: number;
+    description: string;
+}
+
+interface EnhancedSummaryData {
+    avgScore: number;
+    events: number;
+    topEmotions: Record<string, number>;
+    timeline: TimelineEvent[];
+    risks: RiskAssessment[];
+    trends: {
+        daily: { date: string; score: number }[];
+        weekly: { week: string; score: number }[];
+        monthly: { month: string; score: number }[];
+    };
+}
+
+// Generate mock timeline data
+const generateMockTimeline = (): TimelineEvent[] => {
+    const now = new Date();
+    const events: TimelineEvent[] = [];
+    
+    for (let i = 9; i >= 0; i--) {
+        const eventTime = new Date(now.getTime() - i * 2 * 60 * 60 * 1000); // 2 hours apart
+        const sentiscore = 40 + Math.random() * 20 - 10; // Random score between 30-50
+        
+        events.push({
+            id: `event-${i}`,
+            timestamp: eventTime.toISOString(),
+            sentiscore: Math.round(sentiscore * 10) / 10,
+            emotions: {
+                anger: Math.round(Math.random() * 500),
+                frustration: Math.round(Math.random() * 400),
+                sarcasm: Math.round(Math.random() * 100),
+                contempt: Math.round(Math.random() * 400),
+                urgency: Math.round(Math.random() * 400)
+            },
+            risks: Math.random() > 0.7 ? ['absolutism', 'judging'] : [],
+            description: `Event ${i + 1} - ${sentiscore > 45 ? 'High stress' : sentiscore < 35 ? 'Low stress' : 'Moderate stress'} situation`
+        });
+    }
+    
+    return events;
+};
+
+// Generate mock risk assessment
+const generateMockRisks = (): RiskAssessment[] => {
+    return [
+        {
+            category: 'Absolutism',
+            level: 'warning',
+            count: 3,
+            description: 'Using absolute terms like "always", "never", "everyone"'
+        },
+        {
+            category: 'Judging',
+            level: 'super-risky',
+            count: 2,
+            description: 'Making judgments about others or situations'
+        },
+        {
+            category: 'Ultimatum',
+            level: 'super-risky',
+            count: 1,
+            description: 'Giving ultimatums or making threats'
+        }
+    ];
+};
+
+// Generate mock trends
+const generateMockTrends = () => {
+    const daily = [];
+    const weekly = [];
+    const monthly = [];
+    
+    // Daily data for last 7 days
+    for (let i = 6; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        daily.push({
+            date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+            score: Math.round((40 + Math.random() * 20 - 10) * 10) / 10
+        });
+    }
+    
+    // Weekly data for last 4 weeks
+    for (let i = 3; i >= 0; i--) {
+        const weekStart = new Date();
+        weekStart.setDate(weekStart.getDate() - (i * 7));
+        weekly.push({
+            week: `Week ${4-i}`,
+            score: Math.round((40 + Math.random() * 20 - 10) * 10) / 10
+        });
+    }
+    
+    // Monthly data for last 3 months
+    for (let i = 2; i >= 0; i--) {
+        const month = new Date();
+        month.setMonth(month.getMonth() - i);
+        monthly.push({
+            month: month.toLocaleDateString('en-US', { month: 'short' }),
+            score: Math.round((40 + Math.random() * 20 - 10) * 10) / 10
+        });
+    }
+    
+    return { daily, weekly, monthly };
+};
+
+export const mockEnhancedSummaryData: EnhancedSummaryData = {
     avgScore: 44.4,
-    events: 9,
+    events: 10,
     topEmotions: {
         anger: 400,
         frustration: 384,
-        sarcasm: 0,
+        sarcasm: 33,
         contempt: 400,
         urgency: 400
-    }
+    },
+    timeline: generateMockTimeline(),
+    risks: generateMockRisks(),
+    trends: generateMockTrends()
 };
 
 // Simulate API delay
@@ -110,7 +233,7 @@ export const mockApi = {
             throw new Error("Invalid token");
         }
         
-        return mockSummaryData;
+        return mockEnhancedSummaryData;
     }
 };
 

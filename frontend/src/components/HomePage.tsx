@@ -9,7 +9,7 @@ export default function HomePage({ isAuthenticated }: HomePageProps) {
     const navigate = useNavigate();
 
     return (
-        <Container maxWidth="lg" sx={{ minHeight: '100dvh', py: 6 }}>
+        <Container maxWidth={false} sx={{ minHeight: '100dvh', py: 6, px: 4 }}>
             <Box sx={{ width: '100%' }}>
                 {/* Hero Section */}
                 <Box sx={{ textAlign: 'center', mb: 8 }}>

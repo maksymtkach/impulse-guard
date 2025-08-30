@@ -3,9 +3,9 @@
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color-scheme: light;
+  color: #213547;
+  background-color: #f5f5f5;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -30,6 +30,7 @@ body {
   width: 100%;
   height: 100%;
   overflow-x: hidden;
+  background-color: #f5f5f5;
 }
 
 html {
@@ -51,27 +52,103 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: #ffffff;
+  color: #213547;
   cursor: pointer;
-  transition: border-color 0.25s;
+  transition: all 0.25s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 button:hover {
   border-color: #646cff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+/* Consistent light theme */
+a:hover {
+  color: #535bf2;
+}
+
+/* Ensure charts have consistent background and are fully visible */
+.recharts-wrapper {
+  background-color: #ffffff !important;
+  width: 100% !important;
+  border: 1px solid #e0e0e0 !important;
+  border-radius: 4px !important;
+}
+
+.recharts-surface {
+  background-color: #ffffff !important;
+  width: 100% !important;
+}
+
+.recharts-legend-wrapper {
+  background-color: #ffffff !important;
+}
+
+.recharts-tooltip-wrapper {
+  background-color: #ffffff !important;
+}
+
+.recharts-cartesian-axis-line {
+  stroke: #333 !important;
+}
+
+.recharts-cartesian-axis-tick-line {
+  stroke: #333 !important;
+}
+
+.recharts-cartesian-grid-horizontal line {
+  stroke: #e0e0e0 !important;
+}
+
+.recharts-cartesian-grid-vertical line {
+  stroke: #e0e0e0 !important;
+}
+
+/* Force all chart elements to be visible */
+.recharts-responsive-container {
+  background-color: #ffffff !important;
+}
+
+.recharts-default-tooltip {
+  background-color: #ffffff !important;
+  border: 1px solid #ccc !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+}
+
+.recharts-tooltip-cursor {
+  stroke: #4f8cff !important;
+  stroke-width: 2 !important;
+}
+
+/* Ensure responsive containers use full width */
+.recharts-responsive-container {
+  width: 100% !important;
+}
+
+/* Ensure all content areas have consistent background */
+.MuiContainer-root {
+  background-color: #f5f5f5;
+  max-width: none !important;
+  width: 100% !important;
+}
+
+.MuiCard-root {
+  background-color: #ffffff;
+}
+
+/* Ensure full width usage */
+body, html {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+#root {
+  width: 100% !important;
+  max-width: none !important;
 }

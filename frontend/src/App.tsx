@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-import { CssBaseline, Box } from "@mui/material";
+import { CssBaseline } from "@mui/material";
 
 import Navigation from "./components/Navigation";
 import HomePage from "./components/HomePage";
@@ -80,23 +80,7 @@ export default function App() {
             <Router>
                 <Navigation isAuthenticated={isAuthenticated} onLogout={handleLogout} />
                 
-                {/* Mock Mode Indicator */}
-                <Box sx={{ 
-                    position: 'fixed', 
-                    top: 80, 
-                    right: 20, 
-                    zIndex: 1000,
-                    bgcolor: '#ff9800',
-                    color: '#ffffff',
-                    px: 2,
-                    py: 1,
-                    borderRadius: 1,
-                    fontSize: '0.75rem',
-                    fontWeight: 'bold',
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-                }}>
-                    MOCK MODE
-                </Box>
+
                 
                 <Routes>
                     <Route 
