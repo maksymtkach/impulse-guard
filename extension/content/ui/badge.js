@@ -80,16 +80,48 @@ export function detachBadge(){
   if (badgeHost?.parentElement) badgeHost.parentElement.removeChild(badgeHost);
   badgeHost = null; badgeDOM = null;
 }
+import { state } from "../state.js";
+import { CFG } from "../config.js";
 
-export function setBadge(n){
+export async function setBadge(n) {
   if (!badgeDOM) return;
+
   const ring = badgeDOM.getElementById("ring");
   const num  = badgeDOM.getElementById("num");
   const radius = CFG.BADGE/2 - 3;
-  const C = 2*Math.PI*radius;
+  const C = 2 * Math.PI * radius;
   const pct = Math.max(0, Math.min(100, n));
+
   ring.setAttribute("stroke-dasharray", String(C));
-  ring.setAttribute("stroke-dashoffset", String(C*(1-pct/100)));
-  ring.setAttribute("stroke", n<40 ? "#22c55e" : n<70 ? "#f59e0b" : "#ef4444");
+  ring.setAttribute("stroke-dashoffset", String(C * (1 - pct / 100)));
+  ring.setAttribute("stroke", n < 40 ? "#22c55e" : n < 70 ? "#f59e0b" : "#ef4444");
   num.textContent = String(n);
+
+  // --- 🔥 нове: відправка на бек
+  if (n > 0 && state.token) {
+    try {
+      const res = await fetch(`${CFG.API}/event`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${state.token}`
+        },
+        body: JSON.stringify({
+          score: n,
+          emotions: {},   // можна буде додати реальні дані
+          risks: {}
+        })
+      });
+
+      if (!res.ok) {
+        console.error("Backend error:", res.status, await res.text());
+      } else {
+        console.log("✅ Sentiscore saved:", n);
+      }
+    } catch (err) {
+      console.error("❌ Failed to send event:", err);
+    }
+  } else {
+    console.warn("⚠️ No token or score=0, not sending");
+  }
 }

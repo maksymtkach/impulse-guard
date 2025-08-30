@@ -23,3 +23,4 @@ def login(inp: LoginIn, session: Session = Depends(get_session)):
     if not user or not verify_password(inp.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     return {"apiToken": user.api_token}
+    
