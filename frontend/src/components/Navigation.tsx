@@ -79,6 +79,23 @@ export default function Navigation({ isAuthenticated, onLogout }: NavigationProp
                             Profile
                         </Button>
                     )}
+                    
+                    {isAuthenticated && (
+                        <Button 
+                            color="inherit" 
+                            onClick={() => navigate("/recommendations")}
+                            sx={{ 
+                                textDecoration: location.pathname === "/recommendations" ? "underline" : "none",
+                                textUnderlineOffset: "4px",
+                                minWidth: { xs: '120px', sm: 'auto' },
+                                fontSize: { xs: '0.9rem', sm: '1rem' },
+                                fontWeight: 500,
+                                textTransform: 'none'
+                            }}
+                        >
+                            Recommendations
+                        </Button>
+                    )}
                 </Box>
 
                 {/* Right Section - Auth Actions */}

@@ -7,6 +7,7 @@ import Navigation from "./components/Navigation";
 import HomePage from "./components/HomePage";
 import AuthPage from "./components/AuthPage";
 import ProfilePage from "./components/ProfilePage";
+import PersonalRecommendationsPage from "./components/PersonalRecommendationsPage";
 
 // Create a light theme
 const lightTheme = createTheme({
@@ -100,6 +101,14 @@ export default function App() {
                         element={
                             isAuthenticated ? 
                             <ProfilePage token={token} onLogout={handleLogout} /> : 
+                            <Navigate to="/auth" replace />
+                        } 
+                    />
+                    <Route 
+                        path="/recommendations" 
+                        element={
+                            isAuthenticated ? 
+                            <PersonalRecommendationsPage token={token} onLogout={handleLogout} /> : 
                             <Navigate to="/auth" replace />
                         } 
                     />

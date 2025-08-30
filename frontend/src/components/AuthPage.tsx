@@ -64,7 +64,7 @@ export default function AuthPage({ onAuthSuccess }: AuthPageProps) {
   setMsg("");
   try {
     const result = await apiLogin(email, password);
-    localStorage.setItem("token", result.apiToken);
+    localStorage.setItem("ig_token", result.apiToken);
 
     onAuthSuccess(result.apiToken);
     navigate("/profile");
@@ -84,7 +84,7 @@ export default function AuthPage({ onAuthSuccess }: AuthPageProps) {
           ImpulseGuard Account
         </Typography>
         <Typography color="text.secondary" align="center" sx={{ mb: 4, maxWidth: 600 }}>
-          Create an account to get your personal API token for the extension. View your average Sentiscore and emotions.
+          Create an account to get your personal API token for the extension. View your average Behavior Score and emotions.
         </Typography>
 
         <Card elevation={8}>
@@ -161,6 +161,33 @@ export default function AuthPage({ onAuthSuccess }: AuthPageProps) {
               <Typography variant="caption" color="text.secondary" display="block">
                 Password: password123
               </Typography>
+            </Box>
+
+            <Divider sx={{ my: 3 }} />
+
+            <Box sx={{ textAlign: "center" }}>
+              <Button
+                variant="text"
+                color="secondary"
+                onClick={() => {
+                  // Generate a mock token for demo purposes
+                  const mockToken = "demo_skip_" + Math.random().toString(36).substring(2, 15);
+                  localStorage.setItem("ig_token", mockToken);
+                  onAuthSuccess(mockToken);
+                  navigate("/profile");
+                }}
+                sx={{ 
+                  textTransform: "none",
+                  fontSize: "0.875rem",
+                  color: "text.secondary",
+                  "&:hover": {
+                    color: "primary.main",
+                    textDecoration: "underline"
+                  }
+                }}
+              >
+                Skip login & continue to profile →
+              </Button>
             </Box>
           </CardContent>
         </Card>

@@ -8,10 +8,16 @@ import {
   BarChart, Bar, RadialBarChart, RadialBar, PolarAngleAxis
 } from "recharts";
 import { useNavigate } from "react-router-dom";
-import { getSummaryFull } from "../api";
+// TEMPORARY: Commented out API import for demo purposes
+// import { getSummaryFull } from "../api";
 import {
     TrendingUp, Warning, Error as ErrorIcon, Info, Refresh,
-    Timeline, Assessment, Psychology, Security, ContentCopy
+    Timeline, Assessment, Psychology, Security, ContentCopy,
+    EmojiEvents, LocalFireDepartment, Speed, 
+    SentimentVeryDissatisfied, SentimentDissatisfied, SentimentNeutral,
+    SentimentSatisfied, SentimentVerySatisfied, Mood,
+    Diamond, Star, WorkspacePremium, AutoAwesome, 
+    TrendingDown, PsychologyAlt, Shield
 } from '@mui/icons-material';
 
 import { useRef, useLayoutEffect } from "react"; // додай до імпортів
@@ -57,7 +63,7 @@ interface ProfilePageProps {
 interface TimelineEvent {
     id: string;
     timestamp: number;            // UNIX ms
-    sentiscore: number;
+    behaviorScore: number;        // Changed to general behavior score
     emotions: Record<string, number>;
     risks: string[];
     description: string;
@@ -99,6 +105,10 @@ function useBoxWidth(initial = 800) {
 }
 
 export default function ProfilePage({ token, onLogout }: ProfilePageProps) {
+    // TEMPORARY: This component now uses mock data instead of API calls for demonstration
+    // To restore real API functionality, uncomment the API import and the try-catch block in loadSummary()
+    // NOTE: Changed from "Impulse Index" to "Behavior Score" for better clarity
+    
     const [summary, setSummary] = useState<EnhancedSummaryData | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
@@ -110,14 +120,124 @@ export default function ProfilePage({ token, onLogout }: ProfilePageProps) {
     async function loadSummary() {
         if (!token) return;
         setIsLoading(true); setError("");
-        try {
-            const data = await getSummaryFull(token);
-            setSummary(data);
-        } catch (e: any) {
-            setError(e?.message || "Failed to load data");
-        } finally {
+        
+        // TEMPORARY: Comment out API call and use mock data for demo purposes
+        // try {
+        //     const data = await getSummaryFull(token);
+        //     setSummary(data);
+        // } catch (e: any) {
+        //     setError(e?.message || "Failed to load data");
+        // } finally {
+        //     setIsLoading(false);
+        // }
+        
+        // TEMPORARY: Mock data for demonstration
+        setTimeout(() => {
+            const mockData: EnhancedSummaryData = {
+                avgScore: 65,
+                events: 24,
+                topEmotions: {
+                    "frustration": 8,
+                    "anxiety": 6,
+                    "anger": 4,
+                    "stress": 3
+                },
+                timeline: [
+                    {
+                        id: "1",
+                        timestamp: Date.now() - 3600000,
+                        behaviorScore: 75,
+                        emotions: { "frustration": 0.8, "anger": 0.6 },
+                        risks: ["High stress", "Impulsive behavior"],
+                        description: "Work deadline pressure"
+                    },
+                    {
+                        id: "2",
+                        timestamp: Date.now() - 7200000,
+                        behaviorScore: 45,
+                        emotions: { "anxiety": 0.7, "stress": 0.5 },
+                        risks: ["Moderate risk"],
+                        description: "Meeting preparation"
+                    },
+                    {
+                        id: "3",
+                        timestamp: Date.now() - 10800000,
+                        behaviorScore: 85,
+                        emotions: { "anger": 0.9, "frustration": 0.8 },
+                        risks: ["Critical risk", "High impulsivity"],
+                        description: "Traffic incident"
+                    },
+                    {
+                        id: "4",
+                        timestamp: Date.now() - 14400000,
+                        behaviorScore: 35,
+                        emotions: { "stress": 0.4 },
+                        risks: ["Low risk"],
+                        description: "Email checking"
+                    },
+                    {
+                        id: "5",
+                        timestamp: Date.now() - 18000000,
+                        behaviorScore: 60,
+                        emotions: { "anxiety": 0.6, "stress": 0.3 },
+                        risks: ["Moderate risk"],
+                        description: "Social media browsing"
+                    },
+                    {
+                        id: "6",
+                        timestamp: Date.now() - 21600000,
+                        behaviorScore: 25,
+                        emotions: { "stress": 0.2 },
+                        risks: ["Low risk"],
+                        description: "Morning routine"
+                    }
+                ],
+                risks: [
+                    {
+                        category: "High Stress",
+                        level: "super-risky",
+                        count: 3,
+                        description: "Multiple high-stress events detected"
+                    },
+                    {
+                        category: "Impulsive Behavior",
+                        level: "warning",
+                        count: 2,
+                        description: "Risk of impulsive decisions"
+                    },
+                    {
+                        category: "Emotional Regulation",
+                        level: "critical",
+                        count: 1,
+                        description: "Critical emotional state detected"
+                    }
+                ],
+                trends: {
+                    daily: [
+                        { date: "Mon", score: 45 },
+                        { date: "Tue", score: 62 },
+                        { date: "Wed", score: 78 },
+                        { date: "Thu", score: 55 },
+                        { date: "Fri", score: 68 },
+                        { date: "Sat", score: 35 },
+                        { date: "Sun", score: 42 }
+                    ],
+                    weekly: [
+                        { week: "Week 1", score: 58 },
+                        { week: "Week 2", score: 65 },
+                        { week: "Week 3", score: 72 },
+                        { week: "Week 4", score: 61 }
+                    ],
+                    monthly: [
+                        { month: "Jan", score: 55 },
+                        { month: "Feb", score: 68 },
+                        { month: "Mar", score: 62 }
+                    ]
+                }
+            };
+            setSummary(mockData);
             setIsLoading(false);
-        }
+        }, 1000); // Simulate loading delay
     }
 
     useEffect(() => {
@@ -155,10 +275,10 @@ export default function ProfilePage({ token, onLogout }: ProfilePageProps) {
     };
     const getRiskIcon = (level: string) => {
         switch (level) {
-            case 'warning': return <Warning />;
-            case 'super-risky': return <ErrorIcon />;
-            case 'critical': return <Security />;
-            default: return <Info />;
+            case 'warning': return <Warning sx={{ color: '#f59e0b', fontSize: '1.2rem' }} />;
+            case 'super-risky': return <LocalFireDepartment sx={{ color: '#ef4444', fontSize: '1.2rem' }} />;
+            case 'critical': return <Security sx={{ color: '#b91c1c', fontSize: '1.2rem' }} />;
+            default: return <Info sx={{ color: '#757575', fontSize: '1.2rem' }} />;
         }
     };
 
@@ -167,7 +287,7 @@ export default function ProfilePage({ token, onLogout }: ProfilePageProps) {
 
     // ===== Derived data =====
     const timelineScores = useMemo(
-        () => (summary?.timeline ?? []).map(e => e.sentiscore),
+        () => (summary?.timeline ?? []).map(e => e.behaviorScore),
         [summary]
     );
     const timelineDomain = useMemo(
@@ -199,7 +319,7 @@ export default function ProfilePage({ token, onLogout }: ProfilePageProps) {
 
     // Дані для таймлайна через індекс (100% рендер)
     const tl = useMemo(
-        () => (summary?.timeline ?? []).map((p, i) => ({ i, t: p.timestamp, y: p.sentiscore })),
+        () => (summary?.timeline ?? []).map((p, i) => ({ i, t: p.timestamp, y: p.behaviorScore })),
         [summary]
     );
 
@@ -208,37 +328,98 @@ export default function ProfilePage({ token, onLogout }: ProfilePageProps) {
     const trendsBox = useBoxWidth(900);
 
     return (
-        <Container maxWidth={false} sx={{ minHeight: '100dvh', py: 4, px: 4 }}>
+        <Container maxWidth={false} sx={{ 
+            minHeight: '100dvh', 
+            py: 4, 
+            px: 4,
+            '@keyframes shimmer': {
+                '0%': { transform: 'translateX(-100%)' },
+                '100%': { transform: 'translateX(100%)' }
+            }
+        }}>
             <Box sx={{ width: '100%' }}>
                 {/* Header */}
                 <Box sx={{ mb: 4 }}>
-                    <Typography variant="h3" fontWeight={900} sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                        <Psychology sx={{ fontSize: '2rem', color: 'primary.main' }} />
-                        My Profile
-                    </Typography>
-                    <Typography color="text.secondary" sx={{ mt: 1 }}>
-                        Welcome back! Here&apos;s your ImpulseGuard analytics dashboard.
-                    </Typography>
+                    <Box sx={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: 3, 
+                        mb: 3,
+                        p: 4,
+                        background: 'linear-gradient(135deg, rgba(79,140,255,0.08) 0%, rgba(79,140,255,0.03) 100%)',
+                        borderRadius: 4,
+                        border: '1px solid rgba(79,140,255,0.15)',
+                        boxShadow: '0 4px 20px rgba(79,140,255,0.08)',
+                        position: 'relative',
+                        overflow: 'hidden',
+                        '&::before': {
+                            content: '""',
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            height: '2px',
+                            background: 'linear-gradient(90deg, #4f8cff, #6366f1, #8b5cf6)',
+                            borderRadius: '2px'
+                        }
+                    }}>
+                        <Box sx={{
+                            p: 2.5,
+                            borderRadius: 3,
+                            background: 'linear-gradient(135deg, #4f8cff 0%, #6366f1 100%)',
+                            color: 'white',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            boxShadow: '0 8px 25px rgba(79,140,255,0.3)',
+                            position: 'relative',
+                            '&::after': {
+                                content: '""',
+                                position: 'absolute',
+                                inset: 0,
+                                borderRadius: 3,
+                                background: 'linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%)',
+                                animation: 'shimmer 2s infinite'
+                            }
+                        }}>
+                            <Psychology sx={{ fontSize: '2.5rem' }} />
+                        </Box>
+                        <Box>
+                            <Typography variant="h3" fontWeight={900} sx={{ 
+                                color: 'primary.main',
+                                textShadow: '0 2px 4px rgba(79,140,255,0.1)'
+                            }}>
+                                My Profile
+                            </Typography>
+                            <Typography color="text.secondary" sx={{ mt: 1, fontSize: '1.2rem', fontWeight: 500 }}>
+                                Welcome back! Here&apos;s your ImpulseGuard analytics dashboard.
+                            </Typography>
+                        </Box>
+                    </Box>
                 </Box>
 
                 {/* API Token as copy button */}
-                <Card elevation={8} sx={{ mb: 4 }}>
-                    <CardContent>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                            <Typography variant="h6" fontWeight={700}>
+                <Card elevation={8} sx={{ mb: 4, bgcolor: '#ffffff' }}>
+                    <CardContent sx={{ p: 3 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
+                            <Typography variant="h6" fontWeight={700} sx={{ color: '#1f2937' }}>
                                 Your API Token
                             </Typography>
                             <MuiTooltip title="Use this token to connect the browser extension with your account.">
-                                <IconButton size="small" sx={{ color: 'text.secondary' }}>
-                                    <Info />
+                                <IconButton size="small" sx={{ 
+                                    color: 'primary.main',
+                                    bgcolor: 'rgba(79,140,255,0.1)',
+                                    '&:hover': { bgcolor: 'rgba(79,140,255,0.2)' }
+                                }}>
+                                    <Info sx={{ fontSize: '1.2rem' }} />
                                 </IconButton>
                             </MuiTooltip>
                         </Box>
 
-                        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                        <Box sx={{ display: 'flex', gap: 3, alignItems: 'center' }}>
                             <Button
                                 variant="outlined"
-                                startIcon={<ContentCopy />}
+                                startIcon={<ContentCopy sx={{ fontSize: '1.1rem' }} />}
                                 onClick={() => {
                                     navigator.clipboard.writeText(token || '');
                                     setSnack('API token copied to clipboard');
@@ -247,13 +428,22 @@ export default function ProfilePage({ token, onLogout }: ProfilePageProps) {
                                     fontFamily: 'monospace',
                                     fontWeight: 700,
                                     letterSpacing: '.3px',
-                                    px: 2.2, py: 1.2,
+                                    px: 3, py: 1.5,
+                                    borderColor: 'primary.main',
+                                    color: 'primary.main',
+                                    '&:hover': {
+                                        borderColor: 'primary.dark',
+                                        bgcolor: 'rgba(79,140,255,0.05)',
+                                        transform: 'translateY(-1px)',
+                                        boxShadow: '0 4px 12px rgba(79,140,255,0.2)'
+                                    },
+                                    transition: 'all 0.2s ease-in-out'
                                 }}
                             >
                                 {truncatedToken}
                             </Button>
 
-                            <Typography variant="caption" color="text.secondary">
+                            <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
                                 Click to copy your token. Keep it private.
                             </Typography>
                         </Box>
@@ -282,46 +472,79 @@ export default function ProfilePage({ token, onLogout }: ProfilePageProps) {
                             gridTemplateColumns: 'repeat(3, 1fr)',
                             gap: 4, mb: 4, width: '100%'
                         }}>
-                            {/* Sentiscore Overview */}
+                            {/* Behavior Score Overview */}
                             <Card elevation={8} sx={{ height: '100%', bgcolor: '#ffffff' }}>
-  <AutoSizer height={260}>
-    {({ width, height }) => {
-      const avg = Math.round(summary?.avgScore ?? 0);
-      const donutData = [{ track: 100, value: avg }];
-
-      return (
-        <RadialBarChart
-          width={width}
-          height={height}
-          data={donutData}
-          innerRadius="70%"
-          outerRadius="100%"
-          startAngle={90}
-          endAngle={-270}
-        >
-          <PolarAngleAxis type="number" domain={[0, 100]} tick={false} />
-          {/* трек 100% */}
-          <RadialBar dataKey="track" isAnimationActive={false} fill="#f3f4f6" />
-          {/* фактичний відсоток */}
-          <RadialBar
-            dataKey="value"
-            cornerRadius={18}
-            fill={colorForScore(avg)}
-            background
-          />
-        </RadialBarChart>
-      );
-    }}
-  </AutoSizer>
-</Card>
+                                <CardContent sx={{ p: 3, textAlign: 'center' }}>
+                                    <Typography variant="h6" fontWeight={800} gutterBottom sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 3 }}>
+                                        <AutoAwesome sx={{ color: 'primary.main', fontSize: '1.5rem' }} />
+                                        Behavior Score
+                                    </Typography>
+                                    
+                                    <Box sx={{ position: 'relative', display: 'inline-block', my: 3 }}>
+                                        <Box
+                                            sx={{
+                                                width: 140,
+                                                height: 140,
+                                                borderRadius: '50%',
+                                                background: `conic-gradient(${colorForScore(summary?.avgScore || 0)} ${(summary?.avgScore || 0) * 3.6}deg, #f8fafc ${(summary?.avgScore || 0) * 3.6}deg)`,
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                position: 'relative',
+                                                boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+                                                '&::before': {
+                                                    content: '""',
+                                                    position: 'absolute',
+                                                    inset: -4,
+                                                    borderRadius: '50%',
+                                                    background: `linear-gradient(45deg, ${colorForScore(summary?.avgScore || 0)}20, transparent)`,
+                                                    zIndex: -1
+                                                }
+                                            }}
+                                        >
+                                            <Box
+                                                sx={{
+                                                    width: 100,
+                                                    height: 100,
+                                                    borderRadius: '50%',
+                                                    bgcolor: '#ffffff',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    boxShadow: 'inset 0 4px 8px rgba(0,0,0,0.08)',
+                                                    border: '3px solid #ffffff'
+                                                }}
+                                            >
+                                                <Typography variant="h3" fontWeight={900} color={colorForScore(summary?.avgScore || 0)}>
+                                                    {Math.round(summary?.avgScore || 0)}
+                                                </Typography>
+                                            </Box>
+                                        </Box>
+                                    </Box>
+                                    
+                                    <Box sx={{ 
+                                        p: 2, 
+                                        borderRadius: 2, 
+                                        bgcolor: `${colorForScore(summary?.avgScore || 0)}10`,
+                                        border: `1px solid ${colorForScore(summary?.avgScore || 0)}20`
+                                    }}>
+                                        <Typography variant="body2" fontWeight={600} sx={{ 
+                                            color: colorForScore(summary?.avgScore || 0),
+                                            textAlign: 'center'
+                                        }}>
+                                            {summary?.avgScore && summary.avgScore >= 70 ? '⚠️ High Risk' : 
+                                             summary?.avgScore && summary.avgScore >= 40 ? '⚡ Moderate Risk' : '✅ Low Risk'}
+                                        </Typography>
+                                    </Box>
+                                </CardContent>
+                            </Card>
 
 
                             {/* Top Emotions */}
                             <Card elevation={8} sx={{ height: '100%', bgcolor: '#ffffff' }}>
-                                {/* Top Emotions (ranked top-3) */}
-                                <CardContent>
-                                    <Typography variant="h6" fontWeight={800} gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                        <Psychology />
+                                <CardContent sx={{ p: 3 }}>
+                                    <Typography variant="h6" fontWeight={800} gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
+                                        <PsychologyAlt sx={{ color: 'primary.main', fontSize: '1.5rem' }} />
                                         Top Emotions
                                     </Typography>
 
@@ -331,51 +554,72 @@ export default function ProfilePage({ token, onLogout }: ProfilePageProps) {
                                         // топ-3
                                         const top3 = entries.sort((a, b) => b[1] - a[1]).slice(0, 3);
                                         const maxVal = Math.max(...top3.map(([, v]) => v || 1));
-                                        const medals = ["🥇", "🥈", "🥉"];
+                                        const medalIcons = [
+                                            <Typography sx={{ fontSize: '1.8rem' }}>😤</Typography>, // Frustration
+                                            <Typography sx={{ fontSize: '1.8rem' }}>😰</Typography>, // Anxiety  
+                                            <Typography sx={{ fontSize: '1.8rem' }}>😠</Typography>  // Anger
+                                        ];
                                         const gradients = [
-                                            'linear-gradient(90deg, #f59e0b 0%, #f97316 100%)',
-                                            'linear-gradient(90deg, #94a3b8 0%, #64748b 100%)',
-                                            'linear-gradient(90deg, #a78bfa 0%, #6366f1 100%)',
+                                            'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
+                                            'linear-gradient(135deg, #94a3b8 0%, #64748b 100%)',
+                                            'linear-gradient(135deg, #a78bfa 0%, #6366f1 100%)',
                                         ];
 
                                         return (
-                                            <Stack spacing={2} sx={{ mt: 1 }}>
+                                            <Stack spacing={2.5} sx={{ mt: 1 }}>
                                                 {top3.map(([emotion, value], idx) => {
                                                     const pct = Math.round((value / maxVal) * 100);
                                                     return (
                                                         <Box
                                                             key={emotion}
                                                             sx={{
-                                                                p: 2,
-                                                                borderRadius: 2,
-                                                                bgcolor: '#fff',
-                                                                border: '1px solid #e5e7eb',
-                                                                boxShadow: '0 1px 3px rgba(0,0,0,.06)'
+                                                                p: 2.5,
+                                                                borderRadius: 3,
+                                                                bgcolor: '#fafafa',
+                                                                border: '1px solid #f1f5f9',
+                                                                boxShadow: '0 2px 8px rgba(0,0,0,.04)',
+                                                                transition: 'all 0.2s ease-in-out',
+                                                                '&:hover': {
+                                                                    transform: 'translateY(-1px)',
+                                                                    boxShadow: '0 4px 12px rgba(0,0,0,.08)',
+                                                                    bgcolor: '#ffffff'
+                                                                }
                                                             }}
                                                         >
-                                                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
-                                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}>
-                                                                    <Typography fontSize={20}>{medals[idx]}</Typography>
-                                                                    <Typography variant="subtitle1" sx={{ textTransform: 'capitalize', fontWeight: 800 }}>
+                                                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
+                                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                                                    <Box sx={{
+                                                                        p: 1,
+                                                                        borderRadius: 2,
+                                                                        bgcolor: `${gradients[idx].includes('#fbbf24') ? '#fef3c7' : gradients[idx].includes('#94a3b8') ? '#f1f5f9' : '#f3e8ff'}`,
+                                                                        display: 'flex',
+                                                                        alignItems: 'center',
+                                                                        justifyContent: 'center'
+                                                                    }}>
+                                                                        {medalIcons[idx]}
+                                                                    </Box>
+                                                                    <Typography variant="subtitle1" sx={{ textTransform: 'capitalize', fontWeight: 800, color: '#1f2937' }}>
                                                                         {emotion}
                                                                     </Typography>
                                                                 </Box>
-                                                                <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>{value}</Typography>
+                                                                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#374151' }}>{value}</Typography>
                                                             </Box>
 
-                                                            {/* бар з градієнтом */}
-                                                            <Box sx={{ position: 'relative', height: 12, borderRadius: 999, bgcolor: '#f3f4f6', overflow: 'hidden' }}>
+                                                            {/* Progress bar with gradient */}
+                                                            <Box sx={{ position: 'relative', height: 8, borderRadius: 999, bgcolor: '#e5e7eb', overflow: 'hidden', mb: 1 }}>
                                                                 <Box sx={{
                                                                     position: 'absolute',
                                                                     inset: 0,
                                                                     width: `${pct}%`,
                                                                     background: gradients[idx],
+                                                                    borderRadius: 999,
+                                                                    transition: 'width 0.3s ease-in-out'
                                                                 }} />
                                                             </Box>
 
-                                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: .75 }}>
-                                                                <Typography variant="caption" color="text.secondary">vs top</Typography>
-                                                                <Typography variant="caption" fontWeight={700}>{pct}%</Typography>
+                                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500 }}>vs top</Typography>
+                                                                <Typography variant="caption" fontWeight={700} sx={{ color: '#374151' }}>{pct}%</Typography>
                                                             </Box>
                                                         </Box>
                                                     );
@@ -389,28 +633,44 @@ export default function ProfilePage({ token, onLogout }: ProfilePageProps) {
 
                             {/* Risk Assessment */}
                             <Card elevation={8} sx={{ height: '100%', bgcolor: '#ffffff' }}>
-                                <CardContent>
-                                    <Typography variant="h6" fontWeight={800} gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                        <Warning />
+                                <CardContent sx={{ p: 3 }}>
+                                    <Typography variant="h6" fontWeight={800} gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
+                                        <Shield sx={{ color: 'primary.main', fontSize: '1.5rem' }} />
                                         Risk Assessment
                                     </Typography>
                                     <Stack spacing={2}>
                                         {summary.risks.map((risk) => (
                                             <Box key={risk.category} sx={{
-                                                p: 2,
+                                                p: 2.5,
                                                 border: `2px solid ${getRiskColor(risk.level)}`,
-                                                borderRadius: 2,
-                                                bgcolor: `${getRiskColor(risk.level)}10`
+                                                borderRadius: 3,
+                                                bgcolor: `${getRiskColor(risk.level)}08`,
+                                                transition: 'all 0.2s ease-in-out',
+                                                '&:hover': {
+                                                    transform: 'translateY(-2px)',
+                                                    boxShadow: `0 8px 25px ${getRiskColor(risk.level)}20`,
+                                                    bgcolor: `${getRiskColor(risk.level)}12`
+                                                }
                                             }}>
-                                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
                                                     <Typography variant="body2" fontWeight="bold" sx={{ color: getRiskColor(risk.level) }}>
                                                         {risk.category}
                                                     </Typography>
-                                                    <Badge badgeContent={risk.count} color="error">
+                                                    <Badge 
+                                                        badgeContent={risk.count} 
+                                                        color="error"
+                                                        sx={{
+                                                            '& .MuiBadge-badge': {
+                                                                bgcolor: getRiskColor(risk.level),
+                                                                color: '#ffffff',
+                                                                fontWeight: 'bold'
+                                                            }
+                                                        }}
+                                                    >
                                                         {getRiskIcon(risk.level)}
                                                     </Badge>
                                                 </Box>
-                                                <Typography variant="caption" color="text.secondary">
+                                                <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.4 }}>
                                                     {risk.description}
                                                 </Typography>
                                             </Box>
@@ -420,12 +680,12 @@ export default function ProfilePage({ token, onLogout }: ProfilePageProps) {
                             </Card>
                         </Box>
 
-                        {/* Sentiscore Timeline */}
+                        {/* Behavior Score Timeline */}
                         <Box sx={{ mb: 4 }}>
                             <Card elevation={8} sx={{ bgcolor: '#ffffff' }}>
                                 <Box sx={{ p: 2.5, pb: 0 }}>
                                     <Typography variant="h6" fontWeight={800} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                        <Timeline /> Sentiscore Timeline
+                                        <Timeline /> Behavior Score Timeline
                                     </Typography>
                                 </Box>
 
@@ -435,7 +695,7 @@ export default function ProfilePage({ token, onLogout }: ProfilePageProps) {
                                             <LineChart
                                                 width={width}
                                                 height={height}
-                                                data={(summary?.timeline ?? []).map(p => ({ ts: p.timestamp, sentiscore: p.sentiscore }))}
+                                                data={(summary?.timeline ?? []).map(p => ({ ts: p.timestamp, behaviorScore: p.behaviorScore }))}
                                                 margin={{ top: 16, right: 24, left: 8, bottom: 24 }}
                                             >
                                                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
@@ -451,10 +711,10 @@ export default function ProfilePage({ token, onLogout }: ProfilePageProps) {
                                                 <YAxis domain={[0, 100]} tick={{ fontSize: 12, fill: '#333' }} axisLine={{ stroke: '#e5e7eb' }} />
                                                 <RechartsTooltip
                                                     labelFormatter={(v) => new Date(v as number).toLocaleString([], { hour: '2-digit', minute: '2-digit', day: '2-digit', month: 'short' })}
-                                                    formatter={(value: any) => [value, 'Sentiscore']}
+                                                    formatter={(value: any) => [value, 'Behavior Score']}
                                                     contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, boxShadow: '0 8px 24px rgba(0,0,0,.08)' }}
                                                 />
-                                                <Line type="monotone" dataKey="sentiscore" stroke="#4f8cff" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
+                                                <Line type="monotone" dataKey="behaviorScore" stroke="#4f8cff" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
                                             </LineChart>
                                         )}
                                     </AutoSizer>
@@ -485,7 +745,7 @@ export default function ProfilePage({ token, onLogout }: ProfilePageProps) {
                                                 <XAxis dataKey={trendXAxisKey} tick={{ fontSize: 12, fill: '#333' }} axisLine={{ stroke: '#e5e7eb' }} />
                                                 <YAxis domain={trendDomain as any} tick={{ fontSize: 12, fill: '#333' }} axisLine={{ stroke: '#e5e7eb' }} />
                                                 <RechartsTooltip
-                                                    formatter={(value: any) => [value, 'Sentiscore']}
+                                                    formatter={(value: any) => [value, 'Behavior Score']}
                                                     contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, boxShadow: '0 8px 24px rgba(0,0,0,.08)' }}
                                                 />
                                                 <Bar dataKey="score" fill="#4f8cff" radius={[6, 6, 0, 0]} />
@@ -511,7 +771,7 @@ export default function ProfilePage({ token, onLogout }: ProfilePageProps) {
                                         gap: 3
                                     }}>
                                         {summary.timeline.slice(0, 6).map((event) => {
-                                            const cls = classifyScore(event.sentiscore);
+                                            const cls = classifyScore(event.behaviorScore);
                                             return (
                                                 <Box key={event.id}>
                                                     <Paper
@@ -529,7 +789,7 @@ export default function ProfilePage({ token, onLogout }: ProfilePageProps) {
                                                                 {formatTimeHM(event.timestamp)}
                                                             </Typography>
                                                             <Chip
-                                                                label={event.sentiscore}
+                                                                label={event.behaviorScore}
                                                                 size="small"
                                                                 color={cls === 'bad' ? 'error' : cls === 'warn' ? 'warning' : 'success'}
                                                             />
